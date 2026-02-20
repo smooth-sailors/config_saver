@@ -1,5 +1,4 @@
 
-
 use std::fs;
 use rfd::FileDialog;
 use std::path::PathBuf;
@@ -7,14 +6,14 @@ use std::collections::HashMap;
 
 fn main()
 {
-    let file : Option<PathBuf> = select_file();
+    let file : Option<PathBuf> = load_file();
     let file_data : String = get_data_from_file(file);
     let keyed_data = key_and_value_data(&file_data);
-    println!("{:?}", keyed_data);
+    write_map_to_json(&keyed_data, "output.json");
 }
 
 // Choosing the file to load via a dialog menu.
-fn select_file() -> Option<PathBuf>
+fn load_file() -> Option<PathBuf>
 {
     FileDialog::new()
         .set_directory("/")
@@ -28,12 +27,8 @@ fn select_file() -> Option<PathBuf>
 fn get_data_from_file(file: Option<PathBuf>) -> String
 {
     match file {
-        Some(path) => {
-            fs::read_to_string(path).unwrap_or_default()
-        },
-        None => {
-            String::from("Empty file.")
-        }
+        Some(path)  => { fs::read_to_string(path).unwrap_or_default() },
+        None        => { String::from("Empty file.") }
     }
 }
 
@@ -46,6 +41,9 @@ fn key_and_value_data(data: &String) -> HashMap<String, String>
 
     for line in data.lines() {
 
+        // Skipping empty lines.
+        if line.trim().is_empty() { continue; }
+
         // IMPORTANT NOTE: You could modify this line to add in multiple splits to receive
         // multiple parts, but if you do so then you'll need to modify the HashMap structure
         // you're using to have its value be a tuple or vector (this is so you can store multiple
@@ -55,4 +53,10 @@ fn key_and_value_data(data: &String) -> HashMap<String, String>
     }
 
     map
+}
+
+//
+fn write_map_to_json(map: &HashMap<String, String>, path: &str) {
+    let json = serde_json::to_string_pretty(map).unwrap_or_default();
+    fs::write(path, json);
 }
