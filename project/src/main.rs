@@ -22,7 +22,7 @@ fn select_file() -> Option<PathBuf>
         .pick_file()
 }
 
-// Getting the data from the chosen file path.
+// Getting the data from the passed file buffer.
 // Will return an empty string if it couldn't read the data.
 // Will return a string with the contents "Empty file." if there was no data.
 fn get_data_from_file(file: Option<PathBuf>) -> String
@@ -37,11 +37,19 @@ fn get_data_from_file(file: Option<PathBuf>) -> String
     }
 }
 
+// Will return a hashmap of the data that's passed in after it keys and values
+// everything within the lines of data.  Empty values and empty keys will be
+// returned as empty strings "".
 fn key_and_value_data(data: &String) -> HashMap<String, String>
 {
     let mut map = HashMap::new();
 
     for line in data.lines() {
+
+        // IMPORTANT NOTE: You could modify this line to add in multiple splits to receive
+        // multiple parts, but if you do so then you'll need to modify the HashMap structure
+        // you're using to have its value be a tuple or vector (this is so you can store multiple
+        // values for a singular key).
         let parts: Vec<&str> = line.split('=').collect();
         map.insert(String::from(parts[0]), String::from(parts[1]));
     }
