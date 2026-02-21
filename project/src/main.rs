@@ -2,7 +2,7 @@
 use std::fs;
 use std::io;
 use std::path::PathBuf;
-use std::collections::HashMap;
+use indexmap::IndexMap;
 use rfd::FileDialog;
 
 fn main()
@@ -11,7 +11,7 @@ fn main()
     let file_to_convert : Option<PathBuf> = load_text_file();
     let file_data : String = get_data_from_file(file_to_convert);
 
-    // Specify how the data is being split and then map the data onto a HashMap.
+    // Specify how the data is being split and then map the data onto a IndexMap.
     println!("Please input a string that is being used to split the keys and values in your file: ");
     let splitter: String = obtain_input();
     let keyed_data = key_and_value_data(&file_data, &splitter);
@@ -25,10 +25,10 @@ fn main()
 fn load_text_file() -> Option<PathBuf>
 {
     FileDialog::new()
-        .add_filter("Text File", &["txt"])  // Dialog will only show .txt files and folders.
-        .set_directory("/")                 // Dialog starts at root.
-        .set_title("Choose a File")         // Dialog's title.
-        .pick_file()                        // Users can only select one file.
+        .add_filter("TXT, CSV, MD", &["txt", "csv", "md"])        // Dialog will only show .txt files and folders.
+        .set_directory("/")                                       // Dialog starts at root.
+        .set_title("Choose a File")                               // Dialog's title.
+        .pick_file()                                              // Users can only select one file.
 }
 
 // Choosing where to save a JSON file.
@@ -53,12 +53,13 @@ fn get_data_from_file(file: Option<PathBuf>) -> String
     }
 }
 
-// Will return a hashmap of the data that's passed in after it keys and values
+// Will return an indexmap (it's a hashmap without serialization in order to keep the previous
+// order of whatever you're mapping) of the data that's passed in after it keys and values
 // everything within the lines of data.  Empty values and empty keys will be
 // returned as empty strings "".
-fn key_and_value_data(data: &String, split_sequence: &String) -> HashMap<String, String>
+fn key_and_value_data(data: &String, split_sequence: &String) -> IndexMap<String, String>
 {
-    let mut map = HashMap::new();
+    let mut map = IndexMap::new();
 
     for line in data.lines() {
 
@@ -66,7 +67,7 @@ fn key_and_value_data(data: &String, split_sequence: &String) -> HashMap<String,
         if line.trim().is_empty() { continue; }
 
         // IMPORTANT NOTE: You could modify this line to add in multiple splits to receive
-        // multiple parts, but if you do so then you'll need to modify the HashMap structure
+        // multiple parts, but if you do so then you'll need to modify the IndexMap structure
         // you're using to have its value be a tuple or vector (this is so you can store multiple
         // values for a singular key).
         let parts: Vec<&str> = line.split(split_sequence).collect();
@@ -76,8 +77,8 @@ fn key_and_value_data(data: &String, split_sequence: &String) -> HashMap<String,
     map
 }
 
-// Takes a HashMap with keys being strings and values being strings and converts the map into JSON.
-fn write_map_to_json(map: &HashMap<String, String>, file_path: Option<PathBuf>) {
+// Takes a IndexMap with keys being strings and values being strings and converts the map into JSON.
+fn write_map_to_json(map: &IndexMap<String, String>, file_path: Option<PathBuf>) {
 
     // Check to see if file_path is empty or not.
     // If it is, then break the function and throw error information out.
@@ -94,8 +95,18 @@ fn write_map_to_json(map: &HashMap<String, String>, file_path: Option<PathBuf>) 
 // Gets input from user via terminal/console and trims out the newline character from using Enter.
 // If no value is presented, then the default is "".
 fn obtain_input() -> String {
+
+    // Setting up a variable for the input and reading the input into the variable.
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap_or_default();
 
-    String::from(input.trim())
+    // Removing line feed and carriage return characters on the input if they are present.
+    if input.ends_with('\n') {
+        input.pop();
+        if input.ends_with('\r') {
+            input.pop();
+        }
+    }
+
+    String::from(input)
 }
