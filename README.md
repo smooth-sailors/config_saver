@@ -13,7 +13,7 @@
 | **REQUEST** | Call/run the executable that matches with your operating system.                                                                                              |
 | | For Python a call using Linux it would look like:<br/>os.system(r"config_saver/linux86_64")                                                                   |
 | **RECEIVE** | Read and parse - if necessary - the JSON file that you made using the microservice.                                                                           |
-| | To receive the data in Python you msut import os and do this:<br/>with open("config_saver/new_configuration.json") as config: <br/>config_data = json.load(config) |
+| | To receive the data in Python you must import os and do this:<br/>with open("config_saver/new_configuration.json") as config: <br/>config_data = json.load(config) |
 
 ---
 
