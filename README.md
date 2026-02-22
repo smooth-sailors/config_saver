@@ -8,6 +8,7 @@
 
 ---
 
+| | |
 |---|---|
 | **REQUEST** | Call/run the executable that matches with your operating system. |
 | **RECEIVE** | Read and parse - if necessary - the JSON file that you made using the microservice. |
