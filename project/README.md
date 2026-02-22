@@ -24,3 +24,7 @@
 - You must save your key-value pairs to a TXT, CSV, or MD file first.
 - Everything is in string format when saved.
 - Loading will require you to parse the contents.
+
+
+### UML Sequence Diagram
+![A UML Sequence Diagram in the Mermaid format.](UML_Sequence_Diagram.png "UML Sequence Diagram")
